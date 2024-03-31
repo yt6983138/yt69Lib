@@ -38,14 +38,20 @@ public class Logger : ILogger
 {
 	private static readonly object _lock = new();
 
-	public List<string> AllLogs { get; private set; } = new();
+	public static readonly List<string> AllLogs = new();
+	public List<LogLevel> Disabled { get; set; } = new();
+	/// <summary>
+	/// set to -1 to disable
+	/// </summary>
+	public static int MaxLogCapacity { get; set; } = 16384;
+
 	public string LatestLogMessage { get; private set; } = string.Empty;
 	public string LatestLogMessageUnformatted { get; private set; } = string.Empty;
 	// [time] [type] [scope] (id) message
 	public string LogFormat { get; set; } = "[{0}] [{1}] [{2}] ({3}) {4}\n";
 	public string ExceptionFormat { get; set; } = "{0}\nInner: {1}\nStack Trace:\n{2}";
 
-	public List<LogLevel> Disabled { get; set; } = new();
+	public readonly static Logger Shared = new();
 
 	public delegate void LogEventHandler(object? sender, LogEventArgs args);
 	public event LogEventHandler? OnLog;
@@ -76,7 +82,11 @@ public class Logger : ILogger
 		lock (_lock)
 		{
 			Console.Write(formatted);
-			this.AllLogs.Add(formatted);
+			AllLogs.Add(formatted);
+			if (AllLogs.Count > MaxLogCapacity && MaxLogCapacity > 0)
+			{
+				AllLogs.RemoveAt(AllLogs.Count - 1);
+			}
 			this.LatestLogMessageUnformatted = message;
 			this.LatestLogMessage = formatted;
 			WriteMessage(formatted);
