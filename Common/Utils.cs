@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace yt6983138.Common;
+﻿namespace yt6983138.Common;
 public static class Utils
 {
 	public static int GCD(int a, int b)
@@ -112,7 +106,7 @@ public static class Utils
 			else
 			{
 				// Middle is our best fraction
-				return ((n * middle_d + middle_n) * sign, middle_d);
+				return (((n * middle_d) + middle_n) * sign, middle_d);
 			}
 		}
 	}

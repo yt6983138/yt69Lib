@@ -1,11 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace yt6983138.Common;
 public sealed class LoggerProvider : ILoggerProvider
@@ -18,7 +13,7 @@ public sealed class LoggerProvider : ILoggerProvider
 	public LoggerProvider(IOptionsMonitor<LoggerConfiguration> config)
 	{
 		this._currentConfig = config.CurrentValue;
-		this._onChangeToken = config.OnChange(updatedConfig => _currentConfig = updatedConfig)!;
+		this._onChangeToken = config.OnChange(updatedConfig => this._currentConfig = updatedConfig)!;
 	}
 	public ILogger CreateLogger(string name)
 	{

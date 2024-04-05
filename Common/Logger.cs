@@ -1,10 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace yt6983138.Common;
 
@@ -13,7 +8,7 @@ public sealed class StateTracker : IDisposable
 	public bool IsDisposed { get; private set; } = false;
 	public void Dispose()
 	{
-		IsDisposed = true;
+		this.IsDisposed = true;
 	}
 }
 public class LoggerConfiguration
@@ -29,9 +24,9 @@ public class LogEventArgs : EventArgs
 
 	public LogEventArgs(LogLevel type, string message, Exception? ex = null)
 	{
-		Type = type;
-		Message = message;
-		Exception = ex;
+		this.Type = type;
+		this.Message = message;
+		this.Exception = ex;
 	}
 }
 public class Logger : ILogger
@@ -61,11 +56,11 @@ public class Logger : ILogger
 	{
 		try
 		{
-			_logStream = new(pathToWrite!, FileMode.Append, FileAccess.Write);
+			this._logStream = new(pathToWrite!, FileMode.Append, FileAccess.Write);
 		}
 		catch
 		{
-			_logStream = null;
+			this._logStream = null;
 		}
 	}
 	public Logger(LoggerConfiguration config) : this(config.PathToWrite)
@@ -77,7 +72,7 @@ public class Logger : ILogger
 	public void Log<TState>(LogLevel type, string message, EventId id, TState state, Exception? ex = null)
 	{
 		OnLog?.Invoke(this, new(type, message, ex));
-		if (Disabled.Contains(type)) return;
+		if (this.Disabled.Contains(type)) return;
 		string formatted = string.Format(this.LogFormat, DateTime.Now, type.ToString(), typeof(TState).Name, id.ToString(), message);
 		lock (_lock)
 		{
@@ -89,7 +84,7 @@ public class Logger : ILogger
 			}
 			this.LatestLogMessageUnformatted = message;
 			this.LatestLogMessage = formatted;
-			WriteMessage(formatted);
+			this.WriteMessage(formatted);
 		}
 	}
 	public void Log<TState>(LogLevel type, EventId id, TState state, Exception ex)
@@ -100,27 +95,27 @@ public class Logger : ILogger
 				ex.InnerException == null ? "Empty" : ex.InnerException.Message,
 				ex.StackTrace
 				);
-		Log(type, compiled, id, state);
+		this.Log(type, compiled, id, state);
 	}
 	public void Log<TState>(LogLevel level, EventId id, TState state, Exception? ex, Func<TState, Exception?, string> formatter)
 	{
 		string formatted = formatter(state, ex);
 		if (ex is null)
 		{
-			Log(level, formatted, id, state, ex);
+			this.Log(level, formatted, id, state, ex);
 		}
 		else
 		{
-			Log(level, id, state, ex);
+			this.Log(level, id, state, ex);
 		}
 	}
 	public void WriteMessage(string message)
 	{
 		byte[] buf = Encoding.UTF8.GetBytes(message);
-		_logStream?.Write(buf);
+		this._logStream?.Write(buf);
 	}
 	public bool IsEnabled(LogLevel level)
-		=> !Disabled.Contains(level);
+		=> !this.Disabled.Contains(level);
 	public IDisposable BeginScope<TState>(TState obj) where TState : notnull
 	{
 		StateTracker tracker = new();
