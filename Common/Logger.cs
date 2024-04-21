@@ -49,7 +49,8 @@ public class Logger : ILogger
 	public readonly static Logger Shared = new();
 
 	public delegate void LogEventHandler(object? sender, LogEventArgs args);
-	public event LogEventHandler? OnLog;
+	public event LogEventHandler? OnBeforeLog;
+	public event LogEventHandler? OnAfterLog;
 
 	private FileStream? _logStream;
 	public Logger(string? pathToWrite = null)
@@ -71,9 +72,16 @@ public class Logger : ILogger
 
 	public void Log<TState>(LogLevel type, string message, EventId id, TState state, Exception? ex = null)
 	{
-		OnLog?.Invoke(this, new(type, message, ex));
+		OnBeforeLog?.Invoke(this, new(type, message, ex));
 		if (this.Disabled.Contains(type)) return;
 		string formatted = string.Format(this.LogFormat, DateTime.Now, type.ToString(), typeof(TState).Name, id.ToString(), message);
+		if (ex is not null)
+			formatted += string.Format(
+				this.ExceptionFormat,
+				ex.Message,
+				ex.InnerException == null ? "Empty" : ex.InnerException.Message,
+				ex.StackTrace
+				);
 		lock (_lock)
 		{
 			Console.Write(formatted);
@@ -86,6 +94,7 @@ public class Logger : ILogger
 			this.LatestLogMessage = formatted;
 			this.WriteMessage(formatted);
 		}
+		OnAfterLog?.Invoke(this, new(type, message, ex));
 	}
 	public void Log<TState>(LogLevel type, EventId id, TState state, Exception ex)
 	{
