@@ -118,6 +118,18 @@ public class Logger : ILogger
 			this.Log(level, id, state, ex);
 		}
 	}
+	public void Log<TState>(LogLevel level, EventId id, string message, Exception? ex = null)
+		=> this.Log<TState>(level, message, id, default!, ex);
+	public void Log<TState>(LogLevel level, EventId id, string message, Exception? ex, params object?[] format)
+		=> this.Log<TState>(level, string.Format(message, format), id, default!, ex);
+	public void Log<TState>(LogLevel level, EventId id, string message, params object?[] format)
+		=> this.Log<TState>(level, string.Format(message, format), id, default!, null);
+	public void Log(LogLevel level, EventId id, string message, Exception? ex = null)
+		=> this.Log<object>(level, message, id, default!, ex);
+	public void Log(LogLevel level, EventId id, string message, Exception? ex, params object?[] format)
+		=> this.Log<object>(level, string.Format(message, format), id, default!, ex);
+	public void Log(LogLevel level, EventId id, string message, params object?[] format)
+		=> this.Log<object>(level, string.Format(message, format), id, default!, null);
 	public void WriteMessage(string message)
 	{
 		byte[] buf = Encoding.UTF8.GetBytes(message);
