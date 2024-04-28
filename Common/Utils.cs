@@ -114,4 +114,8 @@ public static class Utils
 	{
 		return Math.Max(Math.Min(max, num), min);
 	}
+	public static int Range(int min, int num, int max)
+	{
+		return Math.Max(Math.Min(max, num), min);
+	}
 }
