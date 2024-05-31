@@ -44,7 +44,6 @@ public class Logger : ILogger
 	public string LatestLogMessageUnformatted { get; private set; } = string.Empty;
 	// [time] [type] [scope] (id) message
 	public string LogFormat { get; set; } = "[{0}] [{1}] [{2}] ({3}) {4}\n";
-	public string ExceptionFormat { get; set; } = "{0}\nInner: {1}\nStack Trace:\n{2}";
 
 	public readonly static Logger Shared = new();
 
@@ -76,12 +75,7 @@ public class Logger : ILogger
 		if (this.Disabled.Contains(type)) return;
 		string formatted = string.Format(this.LogFormat, DateTime.Now, type.ToString(), typeof(TState).Name, id.ToString(), message);
 		if (ex is not null)
-			formatted += string.Format(
-				this.ExceptionFormat,
-				ex.Message,
-				ex.InnerException == null ? "Empty" : ex.InnerException.Message,
-				ex.StackTrace
-				);
+			formatted += ex.ToString();
 		lock (_lock)
 		{
 			Console.Write(formatted);
@@ -98,12 +92,7 @@ public class Logger : ILogger
 	}
 	public void Log<TState>(LogLevel type, EventId id, TState state, Exception ex)
 	{
-		string compiled = string.Format(
-				this.ExceptionFormat,
-				ex.Message,
-				ex.InnerException == null ? "Empty" : ex.InnerException.Message,
-				ex.StackTrace
-				);
+		string compiled = ex.ToString();
 		this.Log(type, compiled, id, state);
 	}
 	public void Log<TState>(LogLevel level, EventId id, TState state, Exception? ex, Func<TState, Exception?, string> formatter)
