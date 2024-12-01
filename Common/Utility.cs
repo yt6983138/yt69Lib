@@ -1,5 +1,5 @@
 ﻿namespace yt6983138.Common;
-public static class Utils
+public static class Utility
 {
 	public static int GCD(int a, int b)
 	{
