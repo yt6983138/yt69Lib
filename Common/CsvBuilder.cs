@@ -4,20 +4,22 @@ public class CsvBuilder
 {
 	public string[] Header { get; private set; } = Array.Empty<string>();
 	public List<string[]> Rows { get; private set; } = new();
-	public char Sperator { get; set; } = ',';
+	public string Delimiter { get; set; } = ",";
+
 	public static string EscapeCSVString(string input, char sperator = ',')
 	{
 		string first = input.Replace("\"", "\"\"");
-		if (first.Contains(sperator) || first.Contains("\n"))
+		if (first.Contains(sperator) || first.Contains('\n'))
 		{
 			first = $"\"{first}\"";
 		}
 		return first;
 	}
+
 	public string EscapeCSVString(string input)
 	{
 		string first = input.Replace("\"", "\"\"");
-		if (first.Contains(this.Sperator) || first.Contains("\n"))
+		if (first.Contains(this.Delimiter) || first.Contains("\n"))
 		{
 			first = $"\"{first}\"";
 		}
@@ -44,7 +46,7 @@ public class CsvBuilder
 		}
 		this.Rows.Add(temp);
 	}
-	public string Compile()
+	public override string ToString()
 	{
 		string compiled = "";
 		for (int i = 0; i < this.Header.Length; i++)
@@ -56,7 +58,7 @@ public class CsvBuilder
 			}
 			else
 			{
-				compiled += this.Sperator;
+				compiled += this.Delimiter;
 			}
 		}
 		for (int i = 0; i < this.Rows.Count; i++)
@@ -70,7 +72,7 @@ public class CsvBuilder
 				}
 				else
 				{
-					compiled += this.Sperator;
+					compiled += this.Delimiter;
 				}
 			}
 		}
